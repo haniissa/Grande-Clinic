@@ -1,0 +1,8 @@
+{
+  "name": "Grande Clinic Tabarbour",
+  "description": "Medical Dermatology, Painless Cryo-Cooling Laser Hair Removal & Aesthetic Studio in Tabarbour, Amman — built with Hono.js, DaisyUI, Tailwind CSS, Three.js, and Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

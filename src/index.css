@@ -1,0 +1,85 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: grande --default;
+}
+
+@plugin "daisyui/theme" {
+  name: "grande";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: #fbf9f6;
+  --color-base-200: #f5f3f0;
+  --color-base-300: #eae8e5;
+  --color-base-content: #1b1c1a;
+  --color-primary: #142823;
+  --color-primary-content: #ffffff;
+  --color-secondary: #c5a059;
+  --color-secondary-content: #142823;
+  --color-accent: #25d366;
+  --color-accent-content: #ffffff;
+  --color-neutral: #1b1c1a;
+  --color-neutral-content: #fbf9f6;
+  --color-info: #4e635c;
+  --color-info-content: #ffffff;
+  --color-success: #1a7f46;
+  --color-success-content: #ffffff;
+  --color-warning: #8f6818;
+  --color-warning-content: #ffffff;
+  --color-error: #ba1a1a;
+  --color-error-content: #ffffff;
+  --radius-selector: 9999px;
+  --radius-field: 0.875rem;
+  --radius-box: 1.5rem;
+  --border: 1px;
+}
+
+@layer base {
+  html {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    background-color: #fbf9f6;
+    color: #1b1c1a;
+  }
+
+  html[dir="rtl"] {
+    font-family: "Tajawal", sans-serif;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    overscroll-behavior-y: none;
+  }
+}
+
+.font-display {
+  font-family: "Playfair Display", Georgia, serif;
+}
+
+html[dir="rtl"] .font-display {
+  font-family: "Cairo", "Tajawal", sans-serif;
+}
+
+.font-ui {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+html[dir="rtl"] .font-ui {
+  font-family: "Tajawal", "Cairo", sans-serif;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.brass-hairline {
+  border-color: rgba(197, 160, 89, 0.28);
+}
+
+.clinic-card-shadow {
+  box-shadow: 0 12px 32px -10px rgba(20, 40, 35, 0.07);
+}
+
+.whatsapp-shadow {
+  box-shadow: 0 8px 22px -4px rgba(37, 211, 102, 0.34);
+}
