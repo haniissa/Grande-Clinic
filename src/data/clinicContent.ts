@@ -36,9 +36,9 @@ export interface PatientReview {
 }
 
 export const CLINIC_IMAGES = {
-  logo: '/assets/aistudio/screen_84ba6e2b.png',
-  laserSession: '/assets/aistudio/screen_a697db63.png',
-  luxurySuite: '/assets/aistudio/screen_51823e9e.png',
+  logo: `${import.meta.env.BASE_URL}assets/aistudio/screen_84ba6e2b.png`,
+  laserSession: `${import.meta.env.BASE_URL}assets/aistudio/screen_a697db63.png`,
+  luxurySuite: `${import.meta.env.BASE_URL}assets/aistudio/screen_51823e9e.png`,
 } as const;
 
 export const SERVICE_PACKAGES: ServicePackageItem[] = [

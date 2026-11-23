@@ -6,7 +6,6 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/Grande-Clinic/',
     plugins: [
       react(),
       tailwindcss(),
