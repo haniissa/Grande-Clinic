@@ -11,6 +11,9 @@ import { cors } from 'hono/cors';
 import {
   ALLOWED_TIME_SLOTS,
   buildWhatsAppUrl,
+  CLINIC_LAT,
+  CLINIC_LNG,
+  CLINIC_MAPS_URL,
   CLINIC_PHONE_DISPLAY,
   CLINIC_PLUS_CODE,
   generateBookingReference,
@@ -135,6 +138,8 @@ app.get('/api/clinic/info', (c) => {
     nameAr: 'جراند كلينك طبربور',
     phone: CLINIC_PHONE_DISPLAY,
     plusCode: CLINIC_PLUS_CODE,
+    coordinates: { lat: CLINIC_LAT, lng: CLINIC_LNG },
+    mapsUrl: CLINIC_MAPS_URL,
     address: 'Tarek Street, Tabarbour, Amman, Jordan',
     addressAr: 'شارع طارق، طبربور، عمّان، الأردنية الهاشمية',
     hours: '08:00 – 19:00',

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://haniissa.github.io/Grande-Clinic/sitemap.xml

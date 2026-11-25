@@ -2,6 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildWhatsAppUrl,
+  CLINIC_LAT,
+  CLINIC_LNG,
+  CLINIC_MAPS_DIRECTIONS_URL,
+  CLINIC_MAPS_EMBED_URL,
+  CLINIC_MAPS_URL,
   computeClinicOpenStatus,
   generateBookingReference,
   getRecommendedWavelength,
@@ -85,4 +90,14 @@ test('computeClinicOpenStatus checks daily 08:00-19:00 clinic hours accurately',
 test('generateBookingReference formats sequential Tabarbour codes', () => {
   assert.equal(generateBookingReference(1), 'GC-TAB-1001');
   assert.equal(generateBookingReference(42), 'GC-TAB-1042');
+});
+
+test('Google Business Profile coordinates and Maps links match verified Grande Clinic Tabarbour place', () => {
+  assert.equal(CLINIC_LAT, 32.0030427);
+  assert.equal(CLINIC_LNG, 35.9374969);
+  assert.ok(CLINIC_MAPS_URL.includes('Grande+Clinic+Tabarbour'));
+  assert.ok(CLINIC_MAPS_URL.includes('0x151b6104efac6569:0xad1f53926a6cfaef'));
+  assert.ok(!CLINIC_MAPS_URL.includes('authuser='));
+  assert.ok(CLINIC_MAPS_DIRECTIONS_URL.includes('32.0030427,35.9374969'));
+  assert.ok(CLINIC_MAPS_EMBED_URL.includes('output=embed'));
 });

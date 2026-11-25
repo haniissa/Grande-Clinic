@@ -25,6 +25,10 @@ import {
 } from './data/clinicContent';
 import {
   buildWhatsAppUrl,
+  CLINIC_LAT,
+  CLINIC_LNG,
+  CLINIC_MAPS_DIRECTIONS_URL,
+  CLINIC_MAPS_EMBED_URL,
   CLINIC_MAPS_URL,
   CLINIC_PHONE_DISPLAY,
   CLINIC_PHONE_TEL,
@@ -53,10 +57,38 @@ export default function App() {
   const isAr = lang === 'ar';
   const copy = UI_COPY[lang];
 
-  // Sync HTML dir and lang attributes cleanly for instant RTL/LTR switching
+  // Sync HTML dir, lang, dynamic canonical URL, and bilingual SEO/OpenGraph metadata
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+
+    const title = isAr
+      ? 'جراند كلينك طبربور – عيادة الليزر والجلدية في عمّان'
+      : 'Grande Clinic Tabarbour – Laser & Dermatology in Amman';
+    const description = isAr
+      ? 'إزالة الشعر بالليزر بدون ألم بتقنية التبريد الفائق وعناية بالبشرة في شارع طارق، طبربور، عمّان. تقييم ٤.٥★ (+١,٢٠٠ تقييم). احجزي مع دانا، قمر أو دعاء.'
+      : 'Painless cryo-cooling laser hair removal & medical dermatology on Tarek St., Tabarbour, Amman. Rated 4.5★ (1,200+ reviews). Book with Dana, Qamar & Duaa.';
+
+    document.title = title;
+
+    const setMeta = (selector: string, content: string) => {
+      const el = document.querySelector<HTMLMetaElement>(selector);
+      if (el) el.content = content;
+    };
+
+    setMeta('meta[name="description"]', description);
+    setMeta('meta[property="og:title"]', title);
+    setMeta('meta[property="og:description"]', description);
+    setMeta('meta[property="og:locale"]', isAr ? 'ar_JO' : 'en_JO');
+    setMeta('meta[name="twitter:title"]', title);
+    setMeta('meta[name="twitter:description"]', description);
+
+    if (typeof window !== 'undefined' && window.location.protocol.startsWith('http')) {
+      const canonicalUrl = `${window.location.origin}${window.location.pathname}`;
+      const canonicalLink = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+      if (canonicalLink) canonicalLink.href = canonicalUrl;
+      setMeta('meta[property="og:url"]', canonicalUrl);
+    }
   }, [lang, isAr]);
 
   const fetchBookings = useCallback(async () => {
@@ -524,7 +556,17 @@ export default function App() {
                 <p className="text-sm sm:text-base text-base-content/75">{copy.reviewsSub}</p>
               </div>
 
-              <div className="flex items-center gap-4 rounded-2xl border border-base-300 bg-white px-5 py-3.5 self-start md:self-auto">
+              <a
+                href={CLINIC_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 rounded-2xl border border-base-300 bg-white px-5 py-3.5 self-start md:self-auto transition-colors hover:border-secondary"
+                aria-label={
+                  isAr
+                    ? 'عرض تقييمات جراند كلينك طبربور على ملف الأعمال في Google'
+                    : 'View Grande Clinic Tabarbour reviews on Google Business Profile'
+                }
+              >
                 <div>
                   <div className="flex items-center gap-0.5 text-secondary" aria-label="4.5 out of 5 stars">
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -540,12 +582,12 @@ export default function App() {
                 </div>
                 <div className="h-9 w-px bg-base-300" aria-hidden="true" />
                 <div className="text-xs">
-                  <div className="font-semibold text-primary">Google Maps</div>
+                  <div className="font-semibold text-primary">Google Business Profile</div>
                   <div className="text-base-content/65">
-                    {isAr ? '+١,٢٠٠ تقييم موثق' : '1,200+ Verified Reviews'}
+                    {isAr ? '+١,٢٠٠ تقييم موثق على الخرائط' : '1,200+ Verified Google Reviews'}
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -645,47 +687,54 @@ export default function App() {
                     </div>
                   </div>
 
-                  <dl className="space-y-4 text-sm">
-                    <div className="flex items-start gap-3">
-                      <MapPin className="h-4 w-4 text-secondary shrink-0 mt-1" />
-                      <div>
-                        <dt className="font-semibold text-primary">{copy.addressLabel}</dt>
-                        <dd className="text-base-content/75">{copy.addressValue}</dd>
-                      </div>
-                    </div>
+                    <address className="not-italic">
+                      <dl className="space-y-4 text-sm">
+                        <div className="flex items-start gap-3">
+                          <MapPin className="h-4 w-4 text-secondary shrink-0 mt-1" />
+                          <div>
+                            <dt className="font-semibold text-primary">{copy.addressLabel}</dt>
+                            <dd className="text-base-content/75">{copy.addressValue}</dd>
+                            <dd className="text-[11px] text-base-content/55 tabular-nums mt-0.5">
+                              <span dir="ltr" className="inline-block">
+                                GPS: {CLINIC_LAT.toFixed(6)}, {CLINIC_LNG.toFixed(6)}
+                              </span>
+                            </dd>
+                          </div>
+                        </div>
 
-                    <div className="flex items-start gap-3">
-                      <Car className="h-4 w-4 text-secondary shrink-0 mt-1" />
-                      <div>
-                        <dt className="font-semibold text-primary">{copy.parkingLabel}</dt>
-                        <dd className="text-base-content/75">{copy.parkingValue}</dd>
-                      </div>
-                    </div>
+                        <div className="flex items-start gap-3">
+                          <Car className="h-4 w-4 text-secondary shrink-0 mt-1" />
+                          <div>
+                            <dt className="font-semibold text-primary">{copy.parkingLabel}</dt>
+                            <dd className="text-base-content/75">{copy.parkingValue}</dd>
+                          </div>
+                        </div>
 
-                    <div className="flex items-start gap-3">
-                      <Clock className="h-4 w-4 text-secondary shrink-0 mt-1" />
-                      <div>
-                        <dt className="font-semibold text-primary">{copy.hoursLabel}</dt>
-                        <dd className="text-base-content/75">{copy.hoursValue}</dd>
-                      </div>
-                    </div>
+                        <div className="flex items-start gap-3">
+                          <Clock className="h-4 w-4 text-secondary shrink-0 mt-1" />
+                          <div>
+                            <dt className="font-semibold text-primary">{copy.hoursLabel}</dt>
+                            <dd className="text-base-content/75">{copy.hoursValue}</dd>
+                          </div>
+                        </div>
 
-                    <div className="flex items-start gap-3">
-                      <Phone className="h-4 w-4 text-secondary shrink-0 mt-1" />
-                      <div>
-                        <dt className="font-semibold text-primary">{copy.deskLabel}</dt>
-                        <dd>
-                          <a
-                            href={CLINIC_PHONE_TEL}
-                            dir="ltr"
-                            className="font-semibold text-primary hover:text-secondary tabular-nums"
-                          >
-                            {CLINIC_PHONE_DISPLAY}
-                          </a>
-                        </dd>
-                      </div>
-                    </div>
-                  </dl>
+                        <div className="flex items-start gap-3">
+                          <Phone className="h-4 w-4 text-secondary shrink-0 mt-1" />
+                          <div>
+                            <dt className="font-semibold text-primary">{copy.deskLabel}</dt>
+                            <dd>
+                              <a
+                                href={CLINIC_PHONE_TEL}
+                                dir="ltr"
+                                className="font-semibold text-primary hover:text-secondary tabular-nums"
+                              >
+                                {CLINIC_PHONE_DISPLAY}
+                              </a>
+                            </dd>
+                          </div>
+                        </div>
+                      </dl>
+                    </address>
                 </div>
 
                 <div className="flex flex-col gap-2.5 pt-4 border-t border-base-200">
@@ -710,46 +759,59 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Right Sanctuary & Interactive Coordinates Frame */}
-              <div className="lg:col-span-7 relative min-h-[360px] overflow-hidden rounded-3xl border border-base-300 bg-primary">
-                <img
-                  src={CLINIC_IMAGES.luxurySuite}
-                  alt={
-                    isAr
-                      ? 'عيادة جراند كلينك شارع طارق طبربور عمّان'
-                      : 'Grande Clinic Tabarbour sanctuary on Tarek Street, Amman'
-                  }
-                  referrerPolicy="no-referrer"
-                  className="h-full w-full object-cover opacity-55"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#142823] via-[#142823]/45 to-transparent" />
+              {/* Right Verified Google Business Profile Interactive Map */}
+              <div className="lg:col-span-7 flex flex-col overflow-hidden rounded-3xl border border-base-300 bg-white clinic-card-shadow">
+                <div className="relative flex-1 min-h-[320px] sm:min-h-[380px] w-full bg-base-200">
+                  <iframe
+                    title={
+                      isAr
+                        ? 'موقع جراند كلينك طبربور على خرائط Google'
+                        : 'Grande Clinic Tabarbour Verified Google Maps Location'
+                    }
+                    src={CLINIC_MAPS_EMBED_URL}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    allowFullScreen
+                    className="h-full w-full min-h-[320px] sm:min-h-[380px] border-0"
+                  />
+                </div>
 
-                <div className="absolute bottom-6 inset-x-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                  <div className="rounded-2xl bg-base-100/95 p-4 text-primary max-w-md shadow-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-base-300 bg-base-100 p-5">
+                  <div className="space-y-0.5">
                     <div className="flex items-center gap-2 text-xs font-semibold text-secondary">
                       <Sparkles className="h-3.5 w-3.5" />
                       <span>
-                        {isAr ? 'موقع موثق في طبربور · عمّان' : 'Verified Tabarbour Clinic Location'}
+                        {isAr ? 'ملف أعمال Google الموثق · طبربور' : 'Verified Google Business Profile'}
                       </span>
                     </div>
-                    <div className="font-display text-lg font-semibold mt-1">
+                    <div className="font-display text-lg font-semibold text-primary">
                       {isAr ? 'شارع طارق · مواقف خاصة مجانية' : 'Tarek Street · Dedicated Patient Parking'}
                     </div>
-                    <p className="text-xs text-base-content/75 mt-1">
+                    <p className="text-xs text-base-content/70">
                       {isAr
-                        ? 'دخول خاص وهادئ بدون الازدحام اليومي لغرب عمّان — مفتوح يومياً ٨:٠٠ ص – ٧:٠٠ م.'
-                        : 'Quiet private suite access directly on the Tabarbour corridor — open daily 8:00 AM to 7:00 PM.'}
+                        ? 'مفتوح يومياً ٨:٠٠ ص – ٧:٠٠ م · الإحداثيات الدقيقة 32.0030° N, 35.9375° E'
+                        : 'Open daily 8:00 AM – 7:00 PM · Exact pin 32.0030° N, 35.9375° E'}
                     </p>
                   </div>
 
-                  <a
-                    href={CLINIC_MAPS_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-secondary rounded-full text-secondary-content font-semibold shrink-0"
-                  >
-                    {isAr ? 'الاتجاهات الآن' : 'Get Directions'}
-                  </a>
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <a
+                      href={CLINIC_MAPS_DIRECTIONS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary btn-sm h-10 rounded-full px-5 text-secondary-content font-semibold"
+                    >
+                      {isAr ? 'الاتجاهات الآن' : 'Get Directions'}
+                    </a>
+                    <a
+                      href={CLINIC_MAPS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-ghost btn-sm h-10 rounded-full px-4 text-primary font-semibold"
+                    >
+                      {isAr ? 'عرض على Google' : 'View Profile'}
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

@@ -69,7 +69,15 @@ export const CLINIC_PHONE_DISPLAY = '07 9919 1660';
 export const CLINIC_PHONE_TEL = 'tel:0799191660';
 export const CLINIC_WHATSAPP_NUMBER = '962799191660';
 export const CLINIC_PLUS_CODE = '2W3P+6X9';
-export const CLINIC_MAPS_URL = 'https://maps.google.com/?q=2W3P%2B6X9+Amman';
+export const CLINIC_LAT = 32.0030427;
+export const CLINIC_LNG = 35.9374969;
+export const CLINIC_SITE_URL = 'https://haniissa.github.io/Grande-Clinic/';
+export const CLINIC_MAPS_URL =
+  'https://www.google.com/maps/place/Grande+Clinic+Tabarbour/@32.0030427,35.9374969,771m/data=!3m2!1e3!4b1!4m6!3m5!1s0x151b6104efac6569:0xad1f53926a6cfaef!8m2!3d32.0030427!4d35.9374969!16s%2Fg%2F11n76vxxc1';
+export const CLINIC_MAPS_DIRECTIONS_URL =
+  'https://www.google.com/maps/dir/?api=1&destination=32.0030427,35.9374969';
+export const CLINIC_MAPS_EMBED_URL =
+  'https://www.google.com/maps?q=32.0030427,35.9374969&z=17&output=embed';
 
 export const ALLOWED_TIME_SLOTS = [
   '08:30',
