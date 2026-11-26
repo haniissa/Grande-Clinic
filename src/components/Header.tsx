@@ -1,4 +1,4 @@
-import { CalendarCheck2, Globe, Menu, X } from 'lucide-react';
+import { Globe, Menu, MessageCircle, X } from 'lucide-react';
 import { useState } from 'react';
 import { CLINIC_IMAGES, UI_COPY } from '../data/clinicContent';
 import type { Language } from '../utils/clinicLogic';
@@ -6,17 +6,13 @@ import type { Language } from '../utils/clinicLogic';
 interface HeaderProps {
   lang: Language;
   onToggleLang: () => void;
-  onOpenBooking: () => void;
-  onOpenReservations: () => void;
-  reservationsCount: number;
+  whatsappUrl: string;
 }
 
 export function Header({
   lang,
   onToggleLang,
-  onOpenBooking,
-  onOpenReservations,
-  reservationsCount,
+  whatsappUrl,
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const copy = UI_COPY[lang];
@@ -66,8 +62,8 @@ export function Header({
           ))}
         </nav>
 
-        {/* Zone 3: Language Switch + Reservations + 1 Primary Action */}
-        <div className="flex items-center gap-1 sm:gap-3 shrink-0">
+        {/* Zone 3: Language Switch + Direct WhatsApp Action */}
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           <button
             type="button"
             onClick={onToggleLang}
@@ -80,29 +76,16 @@ export function Header({
             <span>{copy.langSwitch}</span>
           </button>
 
-          <button
-            type="button"
-            onClick={onOpenReservations}
-            aria-label={
-              lang === 'ar'
-                ? `عرض حجوزاتي (${reservationsCount})`
-                : `View reservations (${reservationsCount})`
-            }
-            className="btn btn-ghost btn-sm hidden sm:inline-flex gap-1.5 text-xs font-semibold text-primary whitespace-nowrap shrink-0"
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-accent btn-sm rounded-full px-3 sm:px-5 text-xs font-semibold text-white whitespace-nowrap shrink-0"
           >
-            <CalendarCheck2 className="h-4 w-4 text-secondary" />
-            <span>{copy.myBookings}</span>
-            <span className="tabular-nums text-secondary">({reservationsCount})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onOpenBooking}
-            className="btn btn-primary btn-sm rounded-full px-3 sm:px-5 text-xs font-semibold text-primary-content whitespace-nowrap shrink-0"
-          >
-            <span className="sm:hidden">{lang === 'ar' ? 'احجزي' : 'Book'}</span>
-            <span className="hidden sm:inline">{copy.headerCta}</span>
-          </button>
+            <MessageCircle className="h-3.5 w-3.5 shrink-0" />
+            <span className="sm:hidden">{lang === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
+            <span className="hidden sm:inline">{copy.ctaWhatsApp}</span>
+          </a>
 
           <button
             type="button"
@@ -130,17 +113,6 @@ export function Header({
                 {item.label}
               </a>
             ))}
-            <button
-              type="button"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenReservations();
-              }}
-              className="mt-1 flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold text-primary hover:bg-base-200"
-            >
-              <span>{copy.myBookings}</span>
-              <span className="tabular-nums text-secondary">({reservationsCount})</span>
-            </button>
           </nav>
         </div>
       )}

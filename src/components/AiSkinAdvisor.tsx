@@ -20,7 +20,7 @@ import {
 
 interface AiSkinAdvisorProps {
   lang: Language;
-  onReserveProtocol: (serviceId: ServiceId, specialistId: SpecialistId, notes: string) => void;
+  onReserveProtocol?: (serviceId: ServiceId, specialistId: SpecialistId, notes: string) => void;
 }
 
 interface ChatMessage {
@@ -57,7 +57,6 @@ const QUICK_QUESTIONS: Record<Language, string[]> = {
 
 export function AiSkinAdvisor({
   lang,
-  onReserveProtocol,
 }: AiSkinAdvisorProps) {
   const isAr = lang === 'ar';
   const copy = UI_COPY[lang];
@@ -470,27 +469,16 @@ export function AiSkinAdvisor({
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onReserveProtocol(
-                          serviceId,
-                          (plan.recommendedSpecialist as SpecialistId) || 'dana',
-                          `${plan.wavelengthLabel} · ${plan.estimatedSessions}`
-                        )
-                      }
-                      className="btn btn-primary flex-1 rounded-full text-primary-content font-semibold"
-                    >
-                      {isAr ? 'حجز هذا البروتوكول الآن' : 'Reserve This Protocol'}
-                    </button>
                     <a
                       href={buildWhatsAppUrl(plan.whatsappPrefill)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-accent rounded-full text-white font-semibold"
+                      className="btn btn-accent flex-1 rounded-full text-white font-semibold whatsapp-shadow"
                     >
                       <MessageCircle className="h-4 w-4" />
-                      <span>{isAr ? 'إرسال عبر واتساب' : 'Send via WhatsApp'}</span>
+                      <span>
+                        {isAr ? 'احجزي هذا البروتوكول عبر واتساب' : 'Book This Protocol on WhatsApp'}
+                      </span>
                     </a>
                   </div>
                 </div>

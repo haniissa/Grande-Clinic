@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  Calendar,
   Car,
   CheckCircle2,
   Clock,
@@ -13,9 +12,7 @@ import {
   Star,
 } from 'lucide-react';
 import { AiSkinAdvisor } from './components/AiSkinAdvisor';
-import { BookingModal } from './components/BookingModal';
 import { Header } from './components/Header';
-import { ReservationsDrawer } from './components/ReservationsDrawer';
 import {
   CLINIC_IMAGES,
   PATIENT_REVIEWS,
@@ -33,10 +30,7 @@ import {
   CLINIC_PHONE_DISPLAY,
   CLINIC_PHONE_TEL,
   CLINIC_PLUS_CODE,
-  type BookingRecord,
   type Language,
-  type ServiceId,
-  type SpecialistId,
 } from './utils/clinicLogic';
 
 type PackageFilter = 'all' | 'laser' | 'skin';
@@ -44,15 +38,6 @@ type PackageFilter = 'all' | 'laser' | 'skin';
 export default function App() {
   const [lang, setLang] = useState<Language>('en');
   const [packageFilter, setPackageFilter] = useState<PackageFilter>('all');
-
-  const [bookingModalOpen, setBookingModalOpen] = useState(false);
-  const [bookingServiceId, setBookingServiceId] = useState<ServiceId>('full-body');
-  const [bookingSpecialistId, setBookingSpecialistId] = useState<SpecialistId>('dana');
-  const [bookingNotes, setBookingNotes] = useState('');
-
-  const [reservationsOpen, setReservationsOpen] = useState(false);
-  const [bookings, setBookings] = useState<BookingRecord[]>([]);
-  const [bookingsLoading, setBookingsLoading] = useState(true);
 
   const isAr = lang === 'ar';
   const copy = UI_COPY[lang];
@@ -91,53 +76,6 @@ export default function App() {
     }
   }, [lang, isAr]);
 
-  const fetchBookings = useCallback(async () => {
-    setBookingsLoading(true);
-    try {
-      const res = await fetch('/api/bookings');
-      if (res.ok) {
-        const data = await res.json();
-        setBookings(Array.isArray(data.bookings) ? data.bookings : []);
-      }
-    } catch {
-      // Preserve current state if offline
-    } finally {
-      setBookingsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void fetchBookings();
-  }, [fetchBookings]);
-
-  const openBookingWith = (
-    serviceId: ServiceId = 'full-body',
-    specialistId: SpecialistId = 'dana',
-    notes: string = ''
-  ) => {
-    setBookingServiceId(serviceId);
-    setBookingSpecialistId(specialistId);
-    setBookingNotes(notes);
-    setBookingModalOpen(true);
-  };
-
-  const handleBookingCreated = (created: BookingRecord) => {
-    setBookings((prev) => [created, ...prev]);
-  };
-
-  const handleCancelBooking = async (id: string) => {
-    try {
-      const res = await fetch(`/api/bookings/${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
-        setBookings((prev) => prev.filter((b) => b.id !== id));
-      }
-    } catch {
-      // Ignore transient failure
-    }
-  };
-
   const filteredPackages = useMemo(() => {
     if (packageFilter === 'laser') {
       return SERVICE_PACKAGES.filter(
@@ -169,9 +107,7 @@ export default function App() {
       <Header
         lang={lang}
         onToggleLang={() => setLang((prev) => (prev === 'en' ? 'ar' : 'en'))}
-        onOpenBooking={() => openBookingWith('full-body', 'dana', '')}
-        onOpenReservations={() => setReservationsOpen(true)}
-        reservationsCount={bookings.length}
+        whatsappUrl={primaryWaUrl}
       />
 
       <main className="flex-1">
@@ -227,24 +163,15 @@ export default function App() {
                       href={primaryWaUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-accent btn-lg rounded-full px-7 text-white font-semibold whatsapp-shadow whitespace-nowrap"
+                      className="btn btn-accent btn-lg rounded-full px-8 text-white font-semibold whatsapp-shadow whitespace-nowrap"
                     >
                       <MessageCircle className="h-5 w-5" />
                       <span>{copy.ctaWhatsApp}</span>
                     </a>
 
-                    <button
-                      type="button"
-                      onClick={() => openBookingWith('full-body', 'dana', '')}
-                      className="btn btn-primary btn-lg rounded-full px-7 text-primary-content font-semibold whitespace-nowrap"
-                    >
-                      <Calendar className="h-4 w-4 text-secondary" />
-                      <span>{copy.ctaDirectReserve}</span>
-                    </button>
-
                     <a
                       href={CLINIC_PHONE_TEL}
-                      className="btn btn-ghost btn-lg rounded-full px-5 text-primary font-semibold whitespace-nowrap"
+                      className="btn btn-outline border-base-300 btn-lg rounded-full px-6 text-primary font-semibold hover:bg-primary hover:border-primary hover:text-primary-content whitespace-nowrap"
                     >
                       <Phone className="h-4 w-4 text-secondary" />
                       <span dir="ltr" className="tabular-nums">
@@ -438,25 +365,18 @@ export default function App() {
                   </div>
 
                   <div className="mt-6 pt-5 border-t border-base-200 flex flex-col gap-2">
-                    <button
-                      type="button"
-                      onClick={() => openBookingWith(pkg.id, 'dana', '')}
-                      className={`btn btn-sm h-11 rounded-full font-semibold ${
-                        pkg.featured
-                          ? 'btn-primary text-primary-content'
-                          : 'bg-base-200 border-base-300 text-primary hover:bg-primary hover:text-primary-content'
-                      }`}
-                    >
-                      {pkg.ctaLabel[lang]}
-                    </button>
                     <a
                       href={buildWhatsAppUrl(pkg.whatsappMessage[lang])}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-ghost btn-xs h-9 rounded-full text-xs font-semibold text-[#15803d] hover:bg-[#25d366]/10"
+                      className={`btn btn-sm h-11 rounded-full font-semibold ${
+                        pkg.featured
+                          ? 'btn-accent text-white whatsapp-shadow'
+                          : 'bg-base-200 border-base-300 text-primary hover:bg-accent hover:border-accent hover:text-white'
+                      }`}
                     >
-                      <MessageCircle className="h-3.5 w-3.5" />
-                      <span>{isAr ? 'حجز مباشر عبر واتساب' : 'Quick WhatsApp Inquiry'}</span>
+                      <MessageCircle className="h-4 w-4" />
+                      <span>{pkg.ctaLabel[lang]}</span>
                     </a>
                   </div>
                 </article>
@@ -516,13 +436,19 @@ export default function App() {
                         <span className="text-[11px] font-semibold text-secondary">
                           {sp.credential[lang]}
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => openBookingWith('full-body', sp.id, '')}
-                          className="btn btn-xs btn-outline border-primary/25 text-primary hover:bg-primary hover:text-primary-content rounded-full"
+                        <a
+                          href={buildWhatsAppUrl(
+                            isAr
+                              ? `مرحباً جراند كلينك طبربور، أود حجز موعد مع الأخصائية ${sp.name.ar}.`
+                              : `Hello Grande Clinic Tabarbour, I would like to book an appointment with specialist ${sp.name.en}.`
+                          )}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-xs btn-outline border-primary/25 text-primary hover:bg-accent hover:border-accent hover:text-white rounded-full"
                         >
-                          {isAr ? `حجز مع ${sp.name.ar}` : `Book with ${sp.name.en}`}
-                        </button>
+                          <MessageCircle className="h-3 w-3" />
+                          <span>{isAr ? `حجز مع ${sp.name.ar}` : `Book with ${sp.name.en}`}</span>
+                        </a>
                       </div>
                     </div>
                   ))}
@@ -535,10 +461,7 @@ export default function App() {
         {/* ============================================================
             SECTION 03 — GEMINI AI SKIN PROTOCOL ADVISOR & CONCIERGE
            ============================================================ */}
-        <AiSkinAdvisor
-          lang={lang}
-          onReserveProtocol={(svc, sp, note) => openBookingWith(svc, sp, note)}
-        />
+        <AiSkinAdvisor lang={lang} />
 
         {/* ============================================================
             SECTION 04 — VERIFIED SOCIAL PROOF & CLINICAL STANDARDS
@@ -844,16 +767,15 @@ export default function App() {
                 <MessageCircle className="h-5 w-5" />
                 <span>{copy.ctaWhatsApp}</span>
               </a>
-              <button
-                type="button"
-                onClick={() => openBookingWith('free-assessment', 'duaa', '')}
-                className="btn btn-secondary btn-lg rounded-full px-8 text-secondary-content font-semibold w-full sm:w-auto"
+              <a
+                href={CLINIC_PHONE_TEL}
+                className="btn btn-outline border-white/30 btn-lg rounded-full px-8 text-white font-semibold hover:bg-white/10 hover:border-white/50 w-full sm:w-auto"
               >
-                <Calendar className="h-4 w-4" />
-                <span>
-                  {isAr ? 'احجزي الفحص المجاني إلكترونياً' : 'Book Free Assessment Online'}
+                <Phone className="h-4 w-4 text-[#ffdea5]" />
+                <span dir="ltr" className="tabular-nums">
+                  {CLINIC_PHONE_DISPLAY}
                 </span>
-              </button>
+              </a>
             </div>
           </div>
         </section>
@@ -940,27 +862,6 @@ export default function App() {
           </a>
         </div>
       </aside>
-
-      {/* Interactive Modals */}
-      <BookingModal
-        open={bookingModalOpen}
-        lang={lang}
-        initialServiceId={bookingServiceId}
-        initialSpecialistId={bookingSpecialistId}
-        initialNotes={bookingNotes}
-        onClose={() => setBookingModalOpen(false)}
-        onBookingCreated={handleBookingCreated}
-      />
-
-      <ReservationsDrawer
-        open={reservationsOpen}
-        lang={lang}
-        bookings={bookings}
-        loading={bookingsLoading}
-        onClose={() => setReservationsOpen(false)}
-        onCancelBooking={handleCancelBooking}
-        onNewBooking={() => openBookingWith('full-body', 'dana', '')}
-      />
     </div>
   );
 }
